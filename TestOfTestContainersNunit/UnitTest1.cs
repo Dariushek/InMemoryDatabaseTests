@@ -2,12 +2,89 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 
-namespace TestContainers;
+namespace TestOfTestContainersNunit;
 
-[CollectionDefinition(nameof(MongoDatabaseCollection))]
-public class MongoDatabaseCollection : ICollectionFixture<MongoDatabaseFixture>;
+[TestFixture]
+[Parallelizable(ParallelScope.All)]
+public class Tests
+{
+    [Test]
+    public async Task ReadFromMongoDbDatabase1()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
 
-public class MongoDatabaseFixture : IAsyncLifetime
+        using var databases = await client.ListDatabasesAsync();
+
+        var mongoDatabase = client.GetDatabase(Guid.NewGuid().ToString());
+        mongoDatabase.CreateCollection("test");
+        var collection = mongoDatabase.GetCollection<BsonDocument>("test");
+        await collection.InsertOneAsync(new BsonDocument("name", "value"));
+
+        var list = mongoDatabase.GetCollection<BsonDocument>("test").Find(new BsonDocument()).ToList();
+
+        Assert.True(await databases.AnyAsync());
+    }
+    
+    [Test]
+    public async Task ReadFromMongoDbDatabase2()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
+
+        using var databases = await client.ListDatabasesAsync();
+
+        var mongoDatabase = client.GetDatabase(Guid.NewGuid().ToString());
+        mongoDatabase.CreateCollection("test");
+        var collection = mongoDatabase.GetCollection<BsonDocument>("test");
+        await collection.InsertOneAsync(new BsonDocument("name", "value2"));
+
+        var list = mongoDatabase.GetCollection<BsonDocument>("test").Find(new BsonDocument()).ToList();
+        
+        
+        Assert.True(await databases.AnyAsync());
+    }
+    
+    [Test]
+    public async Task ReadFromMongoDbDatabase3()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
+
+        using var databases = await client.ListDatabasesAsync();
+
+        Assert.True(await databases.AnyAsync());
+    }
+    
+    [Test]
+    public async Task ReadFromMongoDbDatabase4()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
+
+        using var databases = await client.ListDatabasesAsync();
+
+        Assert.True(await databases.AnyAsync());
+    }
+    
+    [Test]
+    public async Task ReadFromMongoDbDatabase5()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
+
+        using var databases = await client.ListDatabasesAsync();
+
+        Assert.True(await databases.AnyAsync());
+    }
+    
+    [Test]
+    public async Task ReadFromMongoDbDatabase6()
+    {
+        var client = new MongoClient(GlobalSetup.MongoDatabaseFixture.MongoDbContainer.GetConnectionString());
+
+        using var databases = await client.ListDatabasesAsync();
+
+        Assert.True(await databases.AnyAsync());
+    }
+}
+
+public class MongoDatabaseFixture
 {
     public readonly MongoDbContainer MongoDbContainer =
         new MongoDbBuilder()
@@ -21,97 +98,26 @@ public class MongoDatabaseFixture : IAsyncLifetime
         => await MongoDbContainer.DisposeAsync();
 }
 
-public class UnitTest1(MongoDatabaseFixture fixture) : IClassFixture<MongoDatabaseFixture>
+[SetUpFixture]
+public class GlobalSetup
 {
-    [Fact]
-    public async Task ReadFromMongoDbDatabase1()
+    public static MongoDatabaseFixture MongoDatabaseFixture;
+
+    [OneTimeSetUp]
+    public async Task GlobalOneTimeSetUp()
     {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        var mongoDatabase = client.GetDatabase(Guid.NewGuid().ToString());
-        mongoDatabase.CreateCollection("test");
-        var collection = mongoDatabase.GetCollection<BsonDocument>("test");
-        await collection.InsertOneAsync(new BsonDocument("name", "value"));
-
-        var list = mongoDatabase.GetCollection<BsonDocument>("test").Find(new BsonDocument()).ToList();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
+        // Initialize the shared MongoDB fixture
+        MongoDatabaseFixture = new MongoDatabaseFixture();
+        await MongoDatabaseFixture.InitializeAsync();
     }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase2()
+
+    [OneTimeTearDown]
+    public async Task GlobalOneTimeTearDown()
     {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        var mongoDatabase = client.GetDatabase(Guid.NewGuid().ToString());
-        mongoDatabase.CreateCollection("test");
-        var collection = mongoDatabase.GetCollection<BsonDocument>("test");
-        await collection.InsertOneAsync(new BsonDocument("name", "value2"));
-
-        var list = mongoDatabase.GetCollection<BsonDocument>("test").Find(new BsonDocument()).ToList();
-        
-        
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
-    }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase3()
-    {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
-    }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase4()
-    {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
-    }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase5()
-    {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
-    }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase6()
-    {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
-    }
-    
-    [Fact]
-    public async Task ReadFromMongoDbDatabase7()
-    {
-        var client = new MongoClient(fixture.MongoDbContainer.GetConnectionString());
-
-        using var databases = await client.ListDatabasesAsync();
-
-        Assert.True(await databases.AnyAsync());
-        Thread.Sleep(1000);
+        // Dispose the MongoDB fixture
+        if (MongoDatabaseFixture != null)
+        {
+            await MongoDatabaseFixture.DisposeAsync();
+        }
     }
 }
